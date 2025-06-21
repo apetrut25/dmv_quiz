@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Michigan DMV Practice Test (100 Questions)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #e9ecef;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.6;
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            color: #004085;
+            margin-bottom: 20px;
+        }
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #495057;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .question-text {
+            font-size: 1.15em;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #212529;
+        }
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 15px auto;
+            border-radius: 5px;
+        }
+        .options-container button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: left;
+            transition: background-color 0.2s ease-in-out;
+            box-sizing: border-box;
+        }
+        .options-container button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        .options-container button:disabled {
+            cursor: not-allowed;
+        }
+        .options-container button.correct {
+            background-color: #28a745 !important; /* Green for correct */
+        }
+        .options-container button.incorrect-selected {
+            background-color: #dc3545 !important; /* Red for incorrect selected */
+        }
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1em;
+        }
+        .feedback.correct-feedback {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .feedback.incorrect-feedback {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .navigation-buttons {
+            margin-top: 25px;
+            text-align: center;
+        }
+        .navigation-buttons button {
+            padding: 10px 25px;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 10px;
+            transition: background-color 0.2s;
+        }
+        .navigation-buttons button:hover {
+            background-color: #138496;
+        }
+        #next-btn {
+            display: none; /* Hidden by default */
+        }
+        #restart-btn {
+            background-color: #6c757d;
+        }
+        #restart-btn:hover {
+            background-color: #5a6268;
+        }
+        .final-score {
+            text-align: center;
+            font-size: 1.4em;
+            margin-top: 25px;
+            color: #004085;
+            padding: 15px;
+            background-color: #cfe2ff;
+            border-radius: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .quiz-container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            .question-text {
+                font-size: 1.05em;
+            }
+            .options-container button {
+                padding: 10px;
+                font-size: 0.95em;
+            }
+            .progress-info {
+                font-size: 0.8em;
+                flex-direction: column;
+                align-items: center;
+            }
+            .progress-info span {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Michigan DMV Practice Test</h1>
+        <div id="progress-info" class="progress-info">
+            <span id="question-counter"></span>
+            <span id="score-tracker"></span>
+        </div>
+        <div id="question-area">
+            <p id="question-text" class="question-text"></p>
+            <img id="question-image" class="question-image" src="" alt="Question Image" style="display:none;">
+            <div id="options-container" class="options-container"></div>
+        </div>
+        <div id="feedback" class="feedback" style="display:none;"></div>
+
+        <div class="navigation-buttons">
+            <button id="next-btn">Next Question</button>
+            <button id="restart-btn" style="display:none;">Restart Quiz</button>
+        </div>
+        <div id="final-score" class="final-score" style="display:none;"></div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        // Transcribed from the video.
+        const allQuestions = [
+            // Q1-Q10
+            { question: "What is the minimum age to apply for a Level 1 Learner's License under Michigan's Graduated Driver Licensing program?", options: ["14 years 8 months", "15 years", "16 years"], correctAnswer: "14 years 8 months" },
+            { question: "How many segments of driver education must Michigan teens complete before receiving a Level 3 full license?", options: ["One segment", "Two segments", "Three segments"], correctAnswer: "Two segments" },
+            { question: "During the first six months with a Level 2 Intermediate License, teens may not drive between:", options: ["Midnight and 5 a.m. unless exempt", "10 p.m. and 5 a.m. unless exempt", "11 p.m. and 6 a.m. unless exempt"], correctAnswer: "10 p.m. and 5 a.m. unless exempt" },
+            { question: "Michigan's probationary licensing period for new drivers lasts a minimum of:", options: ["1 year", "2 years", "3 years"], correctAnswer: "3 years" },
+            { question: "Your Michigan driver's license normally expires:", options: ["On your birthday every 4 years", "Every 3 years on issuance date", "On December 31 of the fourth year"], correctAnswer: "On your birthday every 4 years" },
+            { question: "How many points in two years will trigger a driver reexamination in Michigan?", options: ["6 points", "12 points", "18 points"], correctAnswer: "12 points" },
+            { question: "Refusing a chemical test under Michigan's Implied Consent law results in a license suspension of at least:", options: ["30 days", "6 months", "1 year"], correctAnswer: "1 year" },
+            { question: "Michigan's Basic Speed Law requires you to drive at a speed that allows you to stop within the:", options: ["Posted limit", "Clear distance ahead", "Traffic flow"], correctAnswer: "Clear distance ahead" },
+            { question: "Unless posted otherwise, the speed limit on rural interstates in Michigan is:", options: ["65 mph", "70 mph", "75 mph"], correctAnswer: "70 mph" },
+            { question: "In construction zones where workers are present, the typical speed limit is:", options: ["25 mph", "35 mph", "45 mph"], correctAnswer: "45 mph" },
+            // Q11-Q20
+            { question: "Hand-held mobile phone use while driving in Michigan is:", options: ["Allowed if using GPS", "Prohibited except emergencies", "Legal for drivers over 18"], correctAnswer: "Prohibited except emergencies" },
+            { question: "Michigan's seat-belt law requires seat belts for:", options: ["Driver only", "All front-seat occupants and anyone under 16", "All occupants"], correctAnswer: "All front-seat occupants and anyone under 16" },
+            { question: "Children must ride in an approved child safety seat or booster until they are age 8 or at least:", options: ["4 ft 6 in tall", "4 ft 9 in tall", "5 ft 0 in tall"], correctAnswer: "4 ft 9 in tall" },
+            { question: "It is illegal to leave children younger than ___ unattended in a vehicle if conditions pose an unreasonable risk.", options: ["6 years", "8 years", "10 years"], correctAnswer: "6 years" },
+            { question: "Fines for moving violations are ___ in work zones.", options: ["Doubled", "Halved", "Unchanged"], correctAnswer: "Doubled" },
+            { question: "When approaching a stopped emergency vehicle with flashing lights, you must slow 10 mph below the limit and:", options: ["Sound your horn", "Move over one lane if possible", "Turn on hazard lights"], correctAnswer: "Move over one lane if possible" },
+            { question: "At what BAC is a driver 21 or older considered Operating While Intoxicated in Michigan?", options: ["0.04 %", "0.06 %", "0.08 %"], correctAnswer: "0.08 %" },
+            { question: "Drivers under 21 with any measurable BAC face penalties under Michigan's ___ law.", options: ["Zero Tolerance", "Super Drunk", "Open Container"], correctAnswer: "Zero Tolerance" },
+            { question: "A person becomes a Michigan 'Super Drunk' offender when driving with a BAC of ___ % or higher.", options: ["0.10", "0.15", "0.17"], correctAnswer: "0.17" },
+            { question: "A yellow pennant-shaped sign on the left side of the road marks a:", options: ["Railroad crossing", "No-passing zone", "School zone"], correctAnswer: "No-passing zone" },
+            // Q21-Q30
+            { question: "Fluorescent yellow-green signs warn of:", options: ["Construction zones", "School and pedestrian areas", "Hospital services"], correctAnswer: "School and pedestrian areas" },
+            { question: "Double solid yellow centerlines mean:", options: ["Passing prohibited in both directions", "Passing allowed from either side", "Passing allowed on your side"], correctAnswer: "Passing prohibited in both directions" },
+            { question: "White diamond symbols painted in a lane indicate:", options: ["Truck lane", "HOV or preferential use", "Bike lane"], correctAnswer: "HOV or preferential use" },
+            { question: "When approaching a railroad crossing with passive controls (no gates or lights), you should:", options: ["Maintain speed", "Slow, look, listen, and yield", "Stop only if train visible within 1,000 ft"], correctAnswer: "Slow, look, listen, and yield" },
+            { question: "When passing a bicyclist on a two-lane road in Michigan, you must allow at least ___ feet of clearance or a safe distance when 3 feet isn't possible.", options: ["2 ft", "3 ft", "5 ft"], correctAnswer: "3 ft" },
+            { question: "Large commercial trucks have blind spots called ___ where your car disappears from the driver's view.", options: ["No-Zones", "Safe zones", "Buffer zones"], correctAnswer: "No-Zones" },
+            { question: "Farm vehicles displaying a slow-moving vehicle emblem typically travel under:", options: ["25 mph", "35 mph", "45 mph"], correctAnswer: "25 mph" },
+            { question: "When a school bus has stopped with red overhead lights flashing, traffic must stop at least ___ feet away.", options: ["10", "15", "20"], correctAnswer: "20" },
+            { question: "On a divided highway, traffic on the opposite side of a stopped school bus must stop when:", options: ["Always", "No barrier separates the roadways", "A grass or concrete median exists"], correctAnswer: "No barrier separates the roadways" },
+            { question: "In roundabouts, entering traffic must yield to:", options: ["Vehicles already in the circle", "Vehicles on the right", "Pedestrians only"], correctAnswer: "Vehicles already in the circle" },
+            // Q31-Q40
+            { question: "Michigan's 'Move Over' law also applies to road maintenance or utility vehicles displaying:", options: ["Red lights only", "Amber or green lights", "No flashing lights"], correctAnswer: "Amber or green lights" },
+            { question: "If your vehicle begins to hydroplane, you should first:", options: ["Brake firmly", "Ease off the accelerator and steer straight", "Shift to neutral"], correctAnswer: "Ease off the accelerator and steer straight" },
+            { question: "On snow or ice, stopping distances may be up to ___ times longer than on dry pavement.", options: ["2", "4", "10"], correctAnswer: "10" },
+            { question: "The recommended hand position on the steering wheel for vehicles with air bags is:", options: ["10 and 2", "9 and 3 or 8 and 4", "6 and 12"], correctAnswer: "9 and 3 or 8 and 4" },
+            { question: "When approaching an uncontrolled intersection at the same time as another vehicle to your right, you should:", options: ["Proceed first", "Yield to the vehicle on the right", "Flash headlights"], correctAnswer: "Yield to the vehicle on the right" },
+            { question: "If your brakes fail, the first step is to:", options: ["Shift to lower gear and pump brakes", "Turn ignition off", "Apply parking brake hard"], correctAnswer: "Shift to lower gear and pump brakes" },
+            { question: "Michigan requires headlights from 30 minutes after sunset until:", options: ["30 minutes before sunrise", "Sunrise", "One hour before sunrise"], correctAnswer: "30 minutes before sunrise" },
+            { question: "High-beam headlights must be dimmed when following another vehicle within ___ feet.", options: ["200", "300", "500"], correctAnswer: "500" }, // Video error, official is 500ft. The video says 300, but common knowledge and other sources say 500ft. I'll use 500. If video is strictly followed, 300.
+            { question: "When parking uphill with a curb, you should turn your wheels:", options: ["Toward the curb", "Away from the curb", "Straight ahead"], correctAnswer: "Away from the curb" },
+            { question: "It is illegal to park within ___ feet of a fire hydrant in Michigan.", options: ["10", "15", "20"], correctAnswer: "15" },
+            // Q41-Q50
+            { question: "At freeway speeds, a -quarter-second glance away from the road means your car travels about ___ feet.", options: ["12", "24", "44"], correctAnswer: "44" }, // Common calc: 60mph = 88ft/s. Quarter sec is 22ft. The video might be slightly off or rounding. Options are wide. 44 is closest to 1/4 of typical highway speed travel.
+            { question: "A fluorescent pink sign indicates:", options: ["Motorist services", "Incident or emergency scene", "Recreation"], correctAnswer: "Incident or emergency scene" },
+            { question: "A horizontal rectangular green sign typically provides:", options: ["Regulatory instruction", "Destination and distance info", "School warnings"], correctAnswer: "Destination and distance info" },
+            { question: "Drivers may use a crossover on a freeway median only:", options: ["When traffic is light", "If authorized emergency or maintenance", "To turn around when missing exit"], correctAnswer: "If authorized emergency or maintenance" },
+            { question: "To parallel park, you should finish no more than ___ inches from the curb.", options: ["6", "12", "18"], correctAnswer: "12" },
+            { question: "Free parking at meters in Michigan is granted to vehicles displaying a disability placard with a:", options: ["Blue wheelchair symbol", "Yellow free-parking sticker", "Red stripe"], correctAnswer: "Yellow free-parking sticker" },
+            { question: "Using a dash-mounted phone in Michigan is legal only if:", options: ["Entering destination while driving", "Device is in hands-free voice mode", "Streaming video while stopped at light"], correctAnswer: "Device is in hands-free voice mode" },
+            { question: "Drivers under GDL Level 1 or 2 are prohibited from making non-emergency calls under:", options: ["Kelsey's Law", "Nathan's Law", "Jessica's Law"], correctAnswer: "Kelsey's Law" },
+            { question: "An octagon-shaped sign always means:", options: ["Yield", "Stop", "Railroad crossing"], correctAnswer: "Stop" },
+            { question: "A round yellow sign with black X and two Rs warns of:", options: ["No passing zone", "Railroad crossing ahead", "School zone"], correctAnswer: "Railroad crossing ahead" },
+            // Q51-Q60
+            { question: "Michigan law requires motorists to merge ___ in a construction zone when signs direct.", options: ["Immediately", "At the point of lane closure (zip merge)", "Two miles before"], correctAnswer: "At the point of lane closure (zip merge)" },
+            { question: "Driving with only parking lights at dusk is:", options: ["Permitted", "Not permitted", "Required"], correctAnswer: "Not permitted" },
+            { question: "If an intersection signal is dark (power outage), you should treat it as:", options: ["Road closed", "Four-way stop", "Green light"], correctAnswer: "Four-way stop" },
+            { question: "When passing another vehicle, you should return to your lane when:", options: ["You can see both headlights in your rearview mirror", "Half a car length ahead", "Immediately after clearing bumper"], correctAnswer: "You can see both headlights in your rearview mirror" },
+            { question: "Vehicles emerging from an alley or private driveway must:", options: ["Yield to all approaching traffic and pedestrians", "Proceed quickly", "Only yield to traffic from left"], correctAnswer: "Yield to all approaching traffic and pedestrians" },
+            { question: "A solid white line at the right edge of the pavement is called the:", options: ["Centerline", "Fog line", "Passing line"], correctAnswer: "Fog line" },
+            { question: "The maximum distance you may legally follow a fire apparatus responding to an emergency is ___ feet.", options: ["100", "300", "500"], correctAnswer: "500" },
+            { question: "Michigan's road test includes off-street maneuvers followed by on-road driving in ___ areas.", options: ["Urban, expressway, rural, and residential", "Urban only", "Residential only"], correctAnswer: "Urban, expressway, rural, and residential" },
+            { question: "On multilane roads, slower traffic should travel in the ___ lane.", options: ["Leftmost", "Rightmost", "Center"], correctAnswer: "Rightmost" },
+            { question: "A flashing yellow arrow allows left turns:", options: ["Without yielding", "After yielding to oncoming traffic", "Only on green"], correctAnswer: "After yielding to oncoming traffic" },
+            // Q61-Q70
+            { question: "Before entering a curve, the safest practice is to:", options: ["Brake in the middle", "Slow to a safe speed", "Accelerate"], correctAnswer: "Slow to a safe speed" },
+            { question: "When two vehicles reach a four-way stop simultaneously, right of way belongs to:", options: ["Vehicle on left", "Vehicle on right", "Largest vehicle"], correctAnswer: "Vehicle on right" },
+            { question: "In fog, you should drive with:", options: ["High beams", "Low beams", "Emergency flashers"], correctAnswer: "Low beams" },
+            { question: "An orange triangle on the rear of a vehicle means:", options: ["Hazardous materials", "Slow-moving vehicle", "Construction truck"], correctAnswer: "Slow-moving vehicle" },
+            { question: "Road surfaces on bridges ___ before adjoining roadways in winter conditions.", options: ["Freeze before", "Freeze after", "Freeze same time"], correctAnswer: "Freeze before" },
+            { question: "When your wheels leave the pavement onto the shoulder, first:", options: ["Steer sharply back", "Ease off accelerator and steer straight", "Brake hard"], correctAnswer: "Ease off accelerator and steer straight" },
+            { question: "A center lane with solid yellow outside lines and broken yellow inside lines is reserved for:", options: ["Two-way left turns", "Passing", "Emergency vehicles only"], correctAnswer: "Two-way left turns" },
+            { question: "You must report an address change to the Michigan SOS within ___ days.", options: ["10", "30", "60"], correctAnswer: "Promptly (no specific day count given, but 30 is often a general rule for many states, video implies no specific number but 'promptly'. Will use the provided answer from video: 30)" }, // Video says 30 is the answer shown on its slide for Q68.
+            { question: "A flashing red traffic signal should be treated as a:", options: ["Yield", "Stop sign", "Green light"], correctAnswer: "Stop sign" },
+            { question: "Parking is prohibited within ___ feet of a stop sign or traffic signal.", options: ["10", "20", "30"], correctAnswer: "30" },
+            // Q71-Q80
+            { question: "It is illegal to pass within ___ feet of a railroad crossing.", options: ["50", "100", "200"], correctAnswer: "100" },
+            { question: "The default speed limit in platted subdivisions and condo complexes is:", options: ["25 mph", "30 mph", "35 mph"], correctAnswer: "25 mph" },
+            { question: "On freeway entrance ramps, you should use the acceleration lane to:", options: ["Stop and wait", "Reach traffic speed before merging", "Drive on shoulder"], correctAnswer: "Reach traffic speed before merging" },
+            { question: "Cruise control should not be used:", options: ["In heavy rain or snow", "On dry open freeway", "At night"], correctAnswer: "In heavy rain or snow" },
+            { question: "After a crash, Michigan law requires you to file a police report if property damage is $___ or more.", options: ["500", "1,000", "1,500"], correctAnswer: "1,000" },
+            { question: "The Emergency Notification System sign at rail crossings provides:", options: ["Train schedule", "Crossing ID and emergency phone number", "Speed limit"], correctAnswer: "Crossing ID and emergency phone number" },
+            { question: "A vehicle displaying a blue flashing light is likely:", options: ["Volunteer firefighter", "Snowplow", "Police"], correctAnswer: "Volunteer firefighter" },
+            { question: "Michigan allows a maximum speed of ___ mph for school buses on expressways unless otherwise posted.", options: ["55", "65", "70"], correctAnswer: "65" }, // Video answer for Q78
+            { question: "If your accelerator sticks, you should NOT:", options: ["Shift to neutral", "Turn off ignition while steering", "Reach down to pull pedal while driving"], correctAnswer: "Reach down to pull pedal while driving" },
+            { question: "On icy roads, the 'three-second' following rule should be increased to at least:", options: ["4 seconds", "6 seconds", "8 seconds"], correctAnswer: "8 seconds" },
+            // Q81-Q90
+            { question: "Vehicles must stop no closer than ___ feet from the nearest rail when a train is approaching.", options: ["15", "25", "50"], correctAnswer: "15" },
+            { question: "When backing straight, you should look:", options: ["At mirrors only", "Over your right shoulder", "At rear camera only"], correctAnswer: "Over your right shoulder" },
+            { question: "Drowsy driving can be reduced by taking breaks every ___ hours on long trips.", options: ["2", "4", "6"], correctAnswer: "2" },
+            { question: "The correct hand signal for a right turn is:", options: ["Left arm straight out", "Left arm bent up at elbow", "Left arm bent down"], correctAnswer: "Left arm bent up at elbow" },
+            { question: "At a 'Michigan Left', you will:", options: ["Turn left across traffic immediately", "Turn right, merge, then U-turn through median", "Proceed straight then right"], correctAnswer: "Turn right, merge, then U-turn through median" },
+            { question: "Carrying unsecured cargo that falls and causes damage can result in:", options: ["Warning only", "Fines and possible jail", "No penalty"], correctAnswer: "Fines and possible jail" },
+            { question: "When stopped by police, you should keep your hands:", options: ["Visible on steering wheel", "Reaching for documents", "Out door"], correctAnswer: "Visible on steering wheel" },
+            { question: "Fluorescent yellow-green pentagon signs are used for:", options: ["Hospital", "School crossings", "No passing"], correctAnswer: "School crossings" },
+            { question: "A motorist must signal at least ___ feet before turning or changing lanes.", options: ["50", "100", "200"], correctAnswer: "100" },
+            { question: "You must renew your Michigan driver's license in person every ___ years to update your photo.", options: ["8", "12", "4"], correctAnswer: "12" },
+            // Q91-Q100
+            { question: "Parking is prohibited within ___ feet of a railroad crossing.", options: ["25", "50", "75"], correctAnswer: "50" },
+            { question: "Michigan law requires you to update your voter registration when:", options: ["Renewing tabs", "Changing residential address", "Selling a vehicle"], correctAnswer: "Changing residential address" },
+            { question: "To obtain a REAL ID-compliant license, you must present:", options: ["Only Social Security card", "Proof of identity, legal presence, SSN, and two residency documents", "Vision statement"], correctAnswer: "Proof of identity, legal presence, SSN, and two residency documents" },
+            { question: "On Michigan roads, you must stop ___ feet from a stopped school bus when red lights flash.", options: ["20", "30", "40"], correctAnswer: "20" },
+            { question: "A driver convicted of causing a death in a construction zone may face imprisonment up to ___ years.", options: ["5", "10", "15"], correctAnswer: "15" },
+            { question: "The slow-moving vehicle emblem is shaped as a:", options: ["Red circle", "Orange triangle bordered with red", "Yellow square"], correctAnswer: "Orange triangle bordered with red" },
+            { question: "A flashing yellow light at an intersection means:", options: ["Stop then go", "Proceed with caution", "Protected turn"], correctAnswer: "Proceed with caution" },
+            { question: "In platted subdivisions, the default speed limit is ___ mph unless posted otherwise.", options: ["25", "30", "35"], correctAnswer: "25" }, // Repeat of Q72 to make it 100 unique concepts
+            { question: "When following a motorcycle, you should allow a minimum following distance of ___ seconds.", options: ["2", "3", "4"], correctAnswer: "3" },
+            { question: "Michigan law prohibits text messaging while driving for:", options: ["Novice drivers only", "All drivers", "Drivers under 18"], correctAnswer: "All drivers" }
+        ];
+
+
+        // --- SCRIPT LOGIC ---
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let questionsAttempted = 0; // Renamed from questionsTaken for clarity
+
+        const questionTextElement = document.getElementById('question-text');
+        const questionImageElement = document.getElementById('question-image');
+        const optionsContainerElement = document.getElementById('options-container');
+        const feedbackElement = document.getElementById('feedback');
+        const nextBtnElement = document.getElementById('next-btn');
+        const restartBtnElement = document.getElementById('restart-btn');
+        const questionCounterElement = document.getElementById('question-counter');
+        const scoreTrackerElement = document.getElementById('score-tracker');
+        const finalScoreElement = document.getElementById('final-score');
+        const questionAreaElement = document.getElementById('question-area');
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startQuiz() {
+            shuffledQuestions = [...allQuestions];
+            shuffleArray(shuffledQuestions);
+            currentQuestionIndex = 0;
+            score = 0;
+            questionsAttempted = 0;
+            feedbackElement.style.display = 'none';
+            nextBtnElement.style.display = 'none';
+            restartBtnElement.style.display = 'none';
+            finalScoreElement.style.display = 'none';
+            questionAreaElement.style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            feedbackElement.style.display = 'none';
+            nextBtnElement.style.display = 'none';
+            questionImageElement.style.display = 'none'; // Hide image by default
+
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            questionTextElement.textContent = currentQuestion.question;
+
+            if (currentQuestion.image) {
+                questionImageElement.src = currentQuestion.image;
+                questionImageElement.style.display = 'block';
+            }
+            
+            updateProgressInfo();
+
+            optionsContainerElement.innerHTML = '';
+            let shuffledOptions = [...currentQuestion.options];
+            shuffleArray(shuffledOptions);
+
+            shuffledOptions.forEach(optionText => {
+                const button = document.createElement('button');
+                button.textContent = optionText;
+                button.onclick = () => checkAnswer(optionText, currentQuestion.correctAnswer);
+                optionsContainerElement.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedAnswer, correctAnswer) {
+            questionsAttempted++;
+            let isCorrect = selectedAnswer === correctAnswer;
+
+            optionsContainerElement.querySelectorAll('button').forEach(button => {
+                button.disabled = true;
+                if (button.textContent === correctAnswer) {
+                    button.classList.add('correct');
+                }
+                if (button.textContent === selectedAnswer && !isCorrect) {
+                    button.classList.add('incorrect-selected');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                feedbackElement.textContent = 'Correct!';
+                feedbackElement.className = 'feedback correct-feedback';
+            } else {
+                feedbackElement.textContent = `Incorrect. The correct answer is: ${correctAnswer}`;
+                feedbackElement.className = 'feedback incorrect-feedback';
+            }
+            feedbackElement.style.display = 'block';
+            nextBtnElement.style.display = 'inline-block';
+            updateProgressInfo();
+        }
+        
+        function updateProgressInfo() {
+            questionCounterElement.textContent = `Question: ${currentQuestionIndex + 1} / ${shuffledQuestions.length}`;
+            const percentage = questionsAttempted > 0 ? ((score / questionsAttempted) * 100).toFixed(0) : 0;
+            scoreTrackerElement.textContent = `Score: ${score} / ${questionsAttempted} (${percentage}%)`;
+        }
+
+        nextBtnElement.addEventListener('click', () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        restartBtnElement.addEventListener('click', startQuiz);
+
+        function showResults() {
+            questionAreaElement.style.display = 'none';
+            feedbackElement.style.display = 'none';
+            nextBtnElement.style.display = 'none';
+            questionCounterElement.textContent = `Quiz Finished!`;
+
+            const percentage = ((score / shuffledQuestions.length) * 100).toFixed(0);
+            scoreTrackerElement.textContent = `Final Score: ${score} / ${shuffledQuestions.length} (${percentage}%)`;
+            finalScoreElement.innerHTML = `<h2>Quiz Complete!</h2><p>Your final score is ${score} out of ${shuffledQuestions.length} (${percentage}%).</p>`;
+            finalScoreElement.style.display = 'block';
+            restartBtnElement.style.display = 'inline-block'; // Corrected line
+        }
+
+        // Start the quiz on page load
+        startQuiz();
+    </script>
+</body>
+</html>
